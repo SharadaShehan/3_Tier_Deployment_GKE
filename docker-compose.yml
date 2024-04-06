@@ -1,28 +1,39 @@
 version: "3"
 
 services:
-  # mysql:
-  #   image: mysql:latest
-  #   restart: always
-  #   environment:
-  #     MYSQL_ROOT_PASSWORD: 12345678
-  #     MYSQL_DATABASE: deploy_test_db
-  #     MYSQL_PASSWORD: 12345678
-  #   expose:
-  #     - 3306
-  #   volumes:
-  #     - mysql_data:/var/lib/mysql
-  #   networks:
-  #     - main
+  mysql:
+    image: mysql:latest
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 12345678
+      MYSQL_DATABASE: deploy_test_db
+      MYSQL_PASSWORD: 12345678
+    expose:
+      - 3306
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - main
+  
+  redis_host:
+    image: redis:latest
+    restart: always
+    expose:
+      - 6379
+    volumes:
+      - redis_data:/data
+    networks:
+      - main
 
   flask_app:
     build: ./backend
     expose:
       - 5000
-    # links:
-    #   - mysql:mysql
-    # depends_on:
-    #   - mysql
+    links:
+      - mysql:mysql
+      - redis_host:redis_host
+    depends_on:
+      - mysql
     environment:
       - APP_CODE=Flask-1458
       - MYSQL_PORT=3306
@@ -30,6 +41,8 @@ services:
       - MYSQL_USER=root
       - MYSQL_PASSWORD=12345678
       - MYSQL_DB=deploy_test_db
+      - REDIS_HOST=redis_host
+      - REDIS_PORT=6379
     networks:
       - main
 
@@ -50,7 +63,6 @@ networks:
   main:
     driver: bridge
 
-# volumes:
-#   mysql_data:
-
-
+volumes:
+  mysql_data:
+  redis_data:

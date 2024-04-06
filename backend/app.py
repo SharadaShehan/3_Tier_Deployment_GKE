@@ -3,13 +3,21 @@ from flask_restful import Api, Resource, abort
 from flask_cors import CORS
 from config import Config
 from db import get_db_connection
+from flask_caching import Cache
 
 app = Flask(__name__)
 CORS(app, origins="*", supports_credentials=True)
 app.config.from_object(Config)
+cache = Cache(config={
+    'CACHE_TYPE': 'redis',
+    'CACHE_REDIS_HOST': app.config['REDIS_HOST'],
+    'CACHE_REDIS_PORT': app.config['REDIS_PORT'],
+})
+cache.init_app(app)
 api = Api(app)
 
 class HelloWorld(Resource):
+    @cache.cached(timeout=300)
     def get(self):
         return {'greeting': 'Hello, World!'}
     
@@ -53,6 +61,7 @@ class CreateRecord(Resource):
             return abort(500, message=f"Failed to create record. Error: {ex}")
 
 class GetRecord(Resource):
+    @cache.cached(timeout=30)
     def get(self):
         try:
             connection = get_db_connection()
