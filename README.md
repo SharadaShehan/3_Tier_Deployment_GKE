@@ -37,7 +37,7 @@
     ```
     gcloud container clusters update CLUSTER_NAME --location=ZONE --gateway-api=standard
     ```
-6. Navigate to the root directory of project, replace <DOCKER_IMAGE>, <MYSQL_PASSWORD>, <MYSQL_DATABASE_NAME> with your own values, and apply the configuration files
+6. Navigate to the root directory of project, replace <DOCKER_IMAGE>, <MYSQL_PASSWORD>, <MYSQL_DATABASE_NAME> with your own values, and deploy the configuration
     ```
     kubectl apply -f deploy.yml
     ```
