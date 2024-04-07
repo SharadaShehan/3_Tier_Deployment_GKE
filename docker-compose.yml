@@ -5,9 +5,9 @@ services:
     image: mysql:latest
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: 12345678
-      MYSQL_DATABASE: deploy_test_db
-      MYSQL_PASSWORD: 12345678
+      MYSQL_ROOT_PASSWORD: <MYSQL_ROOT_PASSWORD>  # MYSQL_ROOT_PASSWORD     # Environment variables can be given without quotes
+      MYSQL_DATABASE: <DATABASE_NAME> # DATABASE_NAME
+      MYSQL_PASSWORD: <MYSQL_ROOT_PASSWORD> # MYSQL_ROOT_PASSWORD
     expose:
       - 3306
     volumes:
@@ -26,22 +26,23 @@ services:
       - main
 
   flask_app:
-    build: ./backend
+    build: ./backend  # build the flask app using the Dockerfile in the backend directory
     expose:
       - 5000
     links:
-      - mysql:mysql
-      - redis_host:redis_host
+      - mysql:mysql # allows flask_app to communicate with mysql using hostname mysql
+      - redis_host:redis_host # allows flask_app to communicate with redis_host using hostname redis_host
     depends_on:
       - mysql
+      - redis_host
     environment:
       - APP_CODE=Flask-1458
       - MYSQL_PORT=3306
-      - MYSQL_HOST=mysql
+      - MYSQL_HOST=mysql  # service identifier in the docker-compose file
       - MYSQL_USER=root
-      - MYSQL_PASSWORD=12345678
-      - MYSQL_DB=deploy_test_db
-      - REDIS_HOST=redis_host
+      - MYSQL_PASSWORD=<MYSQL_ROOT_PASSWORD>  # MYSQL_ROOT_PASSWORD
+      - MYSQL_DB=<DATABASE_NAME>  # DATABASE_NAME
+      - REDIS_HOST=redis_host # service identifier in the docker-compose file
       - REDIS_PORT=6379
     networks:
       - main
